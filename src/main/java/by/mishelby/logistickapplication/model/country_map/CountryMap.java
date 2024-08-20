@@ -5,19 +5,21 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigInteger;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "country_map")
 public class CountryMap {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", unique = true, nullable = false)
-    private UUID id;
+    @Column(name = "country_map_id", unique = true, nullable = false)
+    private BigInteger id;
 
     @OneToMany(mappedBy = "countryMap", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<City> cities;

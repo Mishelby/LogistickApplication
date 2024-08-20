@@ -4,25 +4,21 @@ import by.mishelby.logistickapplication.model.driver.DriverStatus.DriverStatus;
 import by.mishelby.logistickapplication.model.truck.Truck.Truck;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.math.BigInteger;
 
 @Entity
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "Driver")
 public class Driver {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "driver_id", unique = true, nullable = false)
-    private UUID id;
+    @Column(name = "driver_id", updatable = false, nullable = false)
+    private BigInteger id;
 
     @Column(name = "first_name")
     @NotBlank(message = "First name should not be null or blank")
@@ -32,7 +28,7 @@ public class Driver {
     @NotBlank(message = "Last name should not be null or blank")
     private String lastName;
 
-    @Column(name = "personal_number")
+    @Column(name = "personal_number", unique = true)
     @NotBlank(message = "Personal number should not be null or blank")
     @Size(min = 10, max = 15, message = "Personal number should be between 10 and 15")
     private String personalNumber;
@@ -47,30 +43,13 @@ public class Driver {
     private DriverStatus driverStatus;
 
     @Column(name = "current_city")
+    @NotBlank(message = "Current city  should not be null or blank")
     private String currentCity;
 
-    @Column(name = "current_truck")
-    private String currentTruck;
-
-    @Valid
-    @OneToMany(mappedBy = "driver", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "current_truck_id")
     @JsonIgnoreProperties("driver")
-    private List<Truck> trucks;
-
-    public void addTruck(Truck truck) {
-        if (trucks == null) {
-            trucks = new ArrayList<>();
-        } else {
-            trucks.add(truck);
-            truck.setDriver(this);
-        }
-    }
-
-    public void removeTruck(Truck truck) {
-        if (trucks != null) {
-            trucks.remove(truck);
-            truck.setDriver(null);
-        }
-    }
+    @ToString.Exclude
+    private Truck currentTruck;
 
 }

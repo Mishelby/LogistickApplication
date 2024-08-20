@@ -10,7 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
+import java.math.BigInteger;
 
 @Entity
 @Data
@@ -18,14 +18,13 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RoutePoint {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", unique = true, nullable = false)
-    private UUID id;
+    @Column(name = "route_id", unique = true, nullable = false)
+    private BigInteger id;
 
     @ManyToOne
-    @JoinColumn(name = "city_id", referencedColumnName = "id")
+    @JoinColumn(name = "city_id", referencedColumnName = "city_id")
     private City city;
 
     @Column(name = "cargo", nullable = false)
@@ -36,7 +35,7 @@ public class RoutePoint {
     private RoutePointType type;
 
     @ManyToOne
-    @JoinColumn(name = "order_id", referencedColumnName = "id")
+    @JoinColumn(name = "order_id", referencedColumnName = "order_id")
     @JsonBackReference
     private Order order;
 }

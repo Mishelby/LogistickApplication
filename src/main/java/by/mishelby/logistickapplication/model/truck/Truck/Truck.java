@@ -2,48 +2,60 @@ package by.mishelby.logistickapplication.model.truck.Truck;
 
 import by.mishelby.logistickapplication.model.driver.Driver;
 import by.mishelby.logistickapplication.model.truck.TruckStatus.TruckStatus;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
-import java.util.UUID;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Truck")
+@Table(name = "truck")
 public class Truck {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private UUID id;
+    @Column(name = "truck_id", updatable = false, nullable = false)
+    private BigInteger id;
 
-    @Column(name = "registration_number")
-    @Pattern(regexp = "[A-Z]{2}\\d{5}")
+    @Column(name = "registration_number", unique = true)
+    @Pattern(regexp = "[A-Z]{2}\\d{5}", message = "Invalid registration number format")
     private String registrationNumber;
 
     @Column(name = "drivers_shift_hours")
-    @NotBlank(message = "Drivers shift hours should not be a null or empty")
+    @NotNull(message = "Drivers shift hours should not be null")
     private Integer driversShiftHours;
 
     @Column(name = "capacity")
-    @NotBlank(message = "Truck capacity should not be a null or empty")
+    @NotNull(message = "Truck capacity should not be null")
     private Integer capacity;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "truck_status")
-    @NotBlank(message = "Truck status should not be an empty or null")
+    @NotNull(message = "Truck status should not be null")
     private TruckStatus truckStatus;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "driver_id", referencedColumnName = "id")
-    @ToString.Exclude
-    @JsonBackReference
-    private Driver driver;
+    @Column(name = "current_city", nullable = false)
+    private String currentCity;
 
+    @OneToMany(mappedBy = "currentTruck", cascade = CascadeType.ALL)
+    private List<Driver> driver;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Truck truck = (Truck) o;
+        return Objects.equals(id, truck.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }
+

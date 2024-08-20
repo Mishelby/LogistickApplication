@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
+import java.math.BigInteger;
 
 @Entity
 @Data
@@ -16,15 +16,15 @@ import java.util.UUID;
 public class Distance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", unique = true, nullable = false)
-    private UUID id;
+    @Column(name = "distance_id", unique = true, nullable = false)
+    private BigInteger id;
 
     @ManyToOne
-    @JoinColumn(name = "city_from_id", referencedColumnName = "id")
+    @JoinColumn(name = "city_from_id", referencedColumnName = "city_id")
     private City cityFrom;
 
     @ManyToOne
-    @JoinColumn(name = "city_to_id", referencedColumnName = "id")
+    @JoinColumn(name = "city_to_id", referencedColumnName = "city_id")
     private City cityTo;
 
     @Column(name = "distance", nullable = false)

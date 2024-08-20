@@ -9,18 +9,19 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.UUID;
+import java.math.BigInteger;
 
 @Entity
 @Data
+@Table(name = "cargo")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class Cargo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "CARGO_ID", unique = true, nullable = false)
-    private UUID id;
+    @Column(name = "cargo_id", unique = true, nullable = false)
+    private BigInteger id;
 
     @Column(name = "number")
     @NotBlank(message = "Cargo number should not be null or blank")
@@ -34,6 +35,7 @@ public class Cargo {
     @NotBlank(message = "Weight should not be an empty or null")
     private Integer weight;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
     @NotBlank(message = "Cargo status should not be an empty or null")
     private CargoStatus cargoStatus;

@@ -8,8 +8,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigInteger;
 import java.util.List;
-import java.util.UUID;
+
 
 @Entity
 @Data
@@ -19,14 +20,14 @@ import java.util.UUID;
 public class City {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", unique = true, nullable = false)
-    private Long id;
+    @Column(name = "city_id", unique = true, nullable = false)
+    private BigInteger id;
 
     @Column(name = "name", unique = true, nullable = false)
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "country_map_id", referencedColumnName = "id")
+    @JoinColumn(name = "country_map_id", referencedColumnName = "country_map_id")
     private CountryMap countryMap;
 
     @OneToMany(mappedBy = "cityFrom", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
