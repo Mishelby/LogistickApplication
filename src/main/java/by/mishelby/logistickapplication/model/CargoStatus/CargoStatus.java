@@ -1,4 +1,4 @@
-package by.mishelby.logistickapplication.model.CargoStatus;
+package by.mishelby.logistickapplication.model.cargoStatus;
 
 public enum CargoStatus {
     PREPARED, SHIPPED, DELIVERED

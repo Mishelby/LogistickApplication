@@ -2,7 +2,6 @@ package by.mishelby.logistickapplication.mapper;
 
 
 import by.mishelby.logistickapplication.domain.DriverDTO.DriverCreateDTO;
-import by.mishelby.logistickapplication.domain.DriverDTO.DriverUpdateDTO;
 import by.mishelby.logistickapplication.model.driver.Driver;
 import org.mapstruct.Mapper;
 

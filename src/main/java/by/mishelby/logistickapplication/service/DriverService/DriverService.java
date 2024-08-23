@@ -11,9 +11,9 @@ public interface DriverService {
 
     Driver findById(Integer id);
 
-    void updateDriver(DriverUpdateDTO updatedDriver);
-
     Driver saveDriver(DriverCreateDTO driverDTO);
+
+    void updateDriver(DriverUpdateDTO updatedDriver);
 
     void deleteDriver(int id);
 }

@@ -98,12 +98,12 @@ public class DriverDAO implements DriverService {
     }
 
     @Override
-    public Driver saveDriver(DriverCreateDTO driverDAO) {
-        if (driverDAO == null) {
+    public Driver saveDriver(DriverCreateDTO driverCreateDTO) {
+        if (driverCreateDTO == null) {
             throw new DriverDTOException("Driver DTO cannot be null");
         }
-        Driver driver = driverMapper.driverDTOToDriver(driverDAO);
-        Truck truck = truckDAO.findTruckById(driverDAO.getTruckId());
+        Driver driver = driverMapper.driverDTOToDriver(driverCreateDTO);
+        Truck truck = truckDAO.findTruckById(driverCreateDTO.getTruckId());
 
         truck.getDriver().add(driver);
         driver.setCurrentTruck(truck);

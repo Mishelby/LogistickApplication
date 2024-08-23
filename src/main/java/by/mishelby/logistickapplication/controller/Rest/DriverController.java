@@ -26,7 +26,7 @@ public class DriverController {
         List<Driver> allDrivers = driverDAO.findAllDrivers();
 
         if (allDrivers.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
         }
 
         return ResponseEntity.ok(allDrivers);

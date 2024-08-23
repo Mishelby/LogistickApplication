@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Trucks List</title>
+  <link rel="stylesheet" th:href="@{/css/styles.css}" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #007bff;
+      color: #fff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .driver-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .driver-list li {
+      margin: 5px 0;
+    }
+
+    .driver-list li:before {
+      content: "\2022";
+      color: #007bff;
+      font-weight: bold;
+      display: inline-block;
+      width: 1em;
+      margin-left: -1em;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Trucks List</h1>
+  <table>
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Registration Number</th>
+      <th>Driver's Shift Hours</th>
+      <th>Capacity</th>
+      <th>Status</th>
+      <th>Current City</th>
+      <th>Drivers</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="truck : ${trucks}">
+      <td th:text="${truck.id}">1</td>
+      <td th:text="${truck.registrationNumber}">AB12345</td>
+      <td th:text="${truck.driversShiftHours}">8</td>
+      <td th:text="${truck.capacity}">1000</td>
+      <td th:text="${truck.truckStatus}">AVAILABLE</td>
+      <td th:text="${truck.currentCity}">New York</td>
+      <td>
+        <ul class="driver-list">
+          <li th:each="driver : ${truck.driver}" th:text="${driver.firstName + ' ' + driver.lastName}">
+            John Doe
+          </li>
+        </ul>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

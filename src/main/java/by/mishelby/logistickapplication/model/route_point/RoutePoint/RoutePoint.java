@@ -1,5 +1,6 @@
 package by.mishelby.logistickapplication.model.route_point.RoutePoint;
 
+import by.mishelby.logistickapplication.model.cargo.Cargo;
 import by.mishelby.logistickapplication.model.city.City;
 import by.mishelby.logistickapplication.model.order.Order.Order;
 import by.mishelby.logistickapplication.model.route_point.RoutePointType.RoutePointType;
@@ -11,10 +12,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigInteger;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Data
 @Builder
+@Table(name = "route_point")
 @AllArgsConstructor
 @NoArgsConstructor
 public class RoutePoint {
@@ -27,8 +31,8 @@ public class RoutePoint {
     @JoinColumn(name = "city_id", referencedColumnName = "city_id")
     private City city;
 
-    @Column(name = "cargo", nullable = false)
-    private String cargo;
+    @OneToMany(mappedBy = "routePoint", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Cargo> cargo;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
@@ -38,5 +42,18 @@ public class RoutePoint {
     @JoinColumn(name = "order_id", referencedColumnName = "order_id")
     @JsonBackReference
     private Order order;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RoutePoint that = (RoutePoint) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }
 

@@ -14,7 +14,6 @@ import java.util.List;
 
 @Entity
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class City {
@@ -23,7 +22,7 @@ public class City {
     @Column(name = "city_id", unique = true, nullable = false)
     private BigInteger id;
 
-    @Column(name = "name", unique = true, nullable = false)
+    @Column(name = "city_name", unique = true, nullable = false)
     private String name;
 
     @ManyToOne
