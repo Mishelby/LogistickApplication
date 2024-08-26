@@ -15,8 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 @Service
 @Transactional
@@ -28,8 +28,8 @@ public class CityDAO implements CityService {
     private final CountryMapDAO countryMapDAO;
 
     @Override
-    public List<City> findAll() {
-        List<City> allCities = cityRepository.findAll();
+    public Collection<City> findAll() {
+        Collection<City> allCities = cityRepository.findAll();
         if (allCities.isEmpty()) {
             return Collections.emptyList();
         }

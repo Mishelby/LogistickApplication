@@ -1,44 +1,60 @@
 package by.mishelby.logistickapplication.controller.Rest;
 
 import by.mishelby.logistickapplication.domain.CityDTO.CityCreateDTO;
-import by.mishelby.logistickapplication.exceptions.CityException.CityException;
 import by.mishelby.logistickapplication.exceptions.Handler.ExceptionControllerAdvice;
 import by.mishelby.logistickapplication.model.city.City;
 import by.mishelby.logistickapplication.service.CityService.CityDAO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.List;
+import java.net.URI;
+import java.util.Collection;
 
 @RestController
-@RequestMapping("/cities")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class CityController {
     private final CityDAO cityDAO;
 
-    @GetMapping("/all")
-    public ResponseEntity<List<City>> getAllCities() {
-        List<City> allCities = cityDAO.findAll();
+    @GetMapping("/cities")
+    public ResponseEntity<Iterable<City>> getAllCities() {
+        Collection<City> allCities = cityDAO.findAll();
         if (allCities.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
+
         return ResponseEntity.ok(allCities);
     }
 
-    @PostMapping("/add")
+    @GetMapping("/city/{id}")
+    public ResponseEntity<City> getCity(@PathVariable int id) {
+        City city = cityDAO.findById(id);
+        return ResponseEntity.ok().body(city);
+    }
+
+    @PostMapping("/city")
     public ResponseEntity<City> createCity(@RequestBody @Valid CityCreateDTO cityCreateDTO,
                                            BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             var errorResponse
                     = ExceptionControllerAdvice.getErrorResponse(bindingResult);
 
-            throw new CityException(errorResponse.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorResponse.getMessage());
         }
         City city = cityDAO.createCity(cityCreateDTO);
 
-        return ResponseEntity.ok(city);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(city.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(city);
     }
 }

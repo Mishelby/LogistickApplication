@@ -6,9 +6,6 @@ import lombok.Data;
 
 @Data
 public class DriverUpdateDTO {
-    @NotNull(message = "Driver id should not be a null")
-    private Integer id;
-
     @NotNull(message = "First name should not be null or blank")
     private String firstName;
 

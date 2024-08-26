@@ -4,6 +4,7 @@ import by.mishelby.logistickapplication.exceptions.CargoException.CargoException
 import by.mishelby.logistickapplication.exceptions.DriverException.DriverDTOException;
 import by.mishelby.logistickapplication.exceptions.ErrorResponce.ErrorResponse;
 import by.mishelby.logistickapplication.exceptions.OrderException.OrderException;
+import by.mishelby.logistickapplication.exceptions.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -36,6 +37,12 @@ public final class ExceptionControllerAdvice {
     public ResponseEntity<ErrorResponse> cargoException(CargoException e) {
         var errorResponse = new ErrorResponse(e.getMessage(), System.currentTimeMillis());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> resourceNotFoundException(ResourceNotFoundException e) {
+        var errorResponse = new ErrorResponse(e.getMessage(), System.currentTimeMillis());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     public static ErrorResponse getErrorResponse(BindingResult bindingResult) {

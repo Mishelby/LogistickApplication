@@ -1,5 +1,7 @@
 package by.mishelby.logistickapplication.service.TruckService;
 
+import by.mishelby.logistickapplication.exceptions.NoChangesDetectedException;
+import by.mishelby.logistickapplication.exceptions.ResourceNotFoundException;
 import by.mishelby.logistickapplication.exceptions.TruckExceptions.TruckException;
 import by.mishelby.logistickapplication.domain.TruckDTO.TruckCreateDTO;
 import by.mishelby.logistickapplication.domain.TruckDTO.TruckUpdateDTO;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,25 +26,26 @@ public class TruckDAO implements TruckService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Truck> findAllTrucks() {
-        List<Truck> allTrucks = truckRepository.findAll();
+    public Collection<Truck> findAllTrucks() {
+        Collection<Truck> allTrucks = truckRepository.findAll();
         if (allTrucks.isEmpty()) {
             return new ArrayList<>();
         }
+
         return allTrucks;
     }
 
     @Override
     public Truck findTruckById(int id) {
         return truckRepository.findById(id).orElseThrow(
-                () -> new TruckException("Truck not found by id: " + id)
+                () -> new ResourceNotFoundException("Truck not found by id: " + id)
         );
     }
 
     @Override
     public Truck saveTruck(TruckCreateDTO truckDTO) {
         if (truckDTO == null) {
-            throw new TruckException("Truck DTO is null");
+            throw new IllegalArgumentException("Truck DTO is null");
         }
 
         Truck truck = truckMapper.truckDTOToTruck(truckDTO);
@@ -49,8 +53,23 @@ public class TruckDAO implements TruckService {
     }
 
     @Override
-    public void updateTruck(TruckUpdateDTO truckUpdateDTO) {
-        Truck truck = this.findTruckById(truckUpdateDTO.getId());
+    public Truck updateTruck(int id, TruckUpdateDTO truckUpdateDTO) {
+        if (truckUpdateDTO == null) {
+            throw new IllegalArgumentException("Truck DTO is null");
+        }
+
+        Truck truck = this.findTruckById(id);
+        boolean isNew = isNew(truckUpdateDTO, truck);
+
+        if (!isNew) {
+            throw new NoChangesDetectedException("No changed detected for truck with id: " + id);
+        }
+
+        truckRepository.save(truck);
+        return truck;
+    }
+
+    private boolean isNew(TruckUpdateDTO truckUpdateDTO, Truck truck) {
         boolean isNew = false;
 
         if (!Objects.equals(truck.getRegistrationNumber(), truckUpdateDTO.getRegistrationNumber())) {
@@ -72,10 +91,7 @@ public class TruckDAO implements TruckService {
             truck.setTruckStatus(truckUpdateDTO.getTruckStatus());
             isNew = true;
         }
-
-        if (isNew) {
-            truckRepository.save(truck);
-        }
+        return isNew;
     }
 
     @Override

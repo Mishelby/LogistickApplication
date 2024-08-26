@@ -15,7 +15,7 @@ public interface CargoService {
 
     Cargo createCargo(CargoCreateDTO cargoCreateDTO);
 
-    ResponseEntity<HttpStatus> updateCargo(CargoUpdateDTO cargoUpdateDTO);
+    Cargo updateCargo(int id, CargoUpdateDTO cargoUpdateDTO);
 
     void deleteCargo(int id);
 }

@@ -12,16 +12,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/cargos")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class CargoController {
     private final CargoDAO cargoDAO;
 
-    @GetMapping
+    @GetMapping("/cargos")
     public ResponseEntity<List<Cargo>> getAllCargos() {
         List<Cargo> cargos = cargoDAO.finAllCargos();
         if (cargos.isEmpty()) {
@@ -31,7 +34,7 @@ public class CargoController {
         return ResponseEntity.ok(cargos);
     }
 
-    @PostMapping("/add")
+    @PostMapping("/cargo")
     public ResponseEntity<Cargo> createCargo(@RequestBody @Valid CargoCreateDTO cargoCreateDTO,
                                              BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -42,20 +45,30 @@ public class CargoController {
         }
 
         Cargo cargo = cargoDAO.createCargo(cargoCreateDTO);
-        return ResponseEntity.ok(cargo);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(cargo.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(cargo);
     }
 
-    @PatchMapping("/update")
-    public ResponseEntity<HttpStatus> updateCargo(@RequestBody @Valid CargoUpdateDTO cargoUpdateDTO,
-                                                  BindingResult bindingResult) {
+    @PatchMapping("/cargo]/{id}")
+    public ResponseEntity<Cargo> updateCargo(@PathVariable("id") int id,
+                                             @RequestBody @Valid CargoUpdateDTO cargoUpdateDTO,
+                                             BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             var errorResponse
                     = ExceptionControllerAdvice.getErrorResponse(bindingResult);
 
-            throw new CargoException(errorResponse.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorResponse.getMessage());
         }
 
-        return cargoDAO.updateCargo(cargoUpdateDTO);
+        Cargo cargo = cargoDAO.updateCargo(id, cargoUpdateDTO);
+
+        return ResponseEntity.ok().body(cargo);
     }
 
     @DeleteMapping("/delete")

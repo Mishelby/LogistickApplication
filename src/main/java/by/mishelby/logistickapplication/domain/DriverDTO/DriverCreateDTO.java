@@ -23,10 +23,10 @@ public class DriverCreateDTO {
     @NotNull(message = "Driver status should not be null")
     private DriverStatus driverStatus;
 
-    @NotBlank(message = "Current city should not be null or blank")
+    @NotNull(message = "Current city should not be null")
     private String currentCity;
 
-    @NotBlank(message = "Truck id should not be a null or blank")
+    @NotNull(message = "Truck id should not be null")
     private Integer truckId;
 
 }

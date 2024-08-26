@@ -2,6 +2,7 @@ package by.mishelby.logistickapplication.service.CargoService;
 
 import by.mishelby.logistickapplication.domain.CargoDTO.CargoCreateDTO;
 import by.mishelby.logistickapplication.domain.CargoDTO.CargoUpdateDTO;
+import by.mishelby.logistickapplication.exceptions.NoChangesDetectedException;
 import by.mishelby.logistickapplication.mapper.CargoMapper;
 import by.mishelby.logistickapplication.model.cargo.Cargo;
 import by.mishelby.logistickapplication.model.route_point.RoutePoint.RoutePoint;
@@ -44,7 +45,9 @@ public class CargoDAO implements CargoService {
             log.info("Cargo DTO to Cargo is null");
             throw new IllegalArgumentException("Cargo DTO cannot be null");
         }
+
         Cargo cargoDTOToCargo = cargoMapper.createCargoDTOToCargo(cargoCreateDTO);
+
         return cargoRepository.save(cargoDTOToCargo);
     }
 
@@ -55,9 +58,8 @@ public class CargoDAO implements CargoService {
     }
 
     @Override
-    public ResponseEntity<HttpStatus> updateCargo(CargoUpdateDTO cargoUpdateDTO) {
+    public Cargo updateCargo(int id, CargoUpdateDTO cargoUpdateDTO) {
         if (cargoUpdateDTO == null) {
-            log.info("Cargo DTO to Cargo is null");
             throw new IllegalArgumentException("Cargo DTO cannot be null");
         }
 
@@ -66,10 +68,10 @@ public class CargoDAO implements CargoService {
         boolean extracted = updateCargoFields(cargoUpdateDTO, cargo);
 
         if (!extracted) {
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+            throw new NoChangesDetectedException("No changes detected for Cargo with id: " + id);
         }
 
-        return ResponseEntity.ok().body(HttpStatus.OK);
+        return cargoRepository.save(cargo);
     }
 
     private boolean updateCargoFields(CargoUpdateDTO cargoUpdateDTO, Cargo cargo) {

@@ -5,16 +5,17 @@ import by.mishelby.logistickapplication.domain.TruckDTO.TruckCreateDTO;
 import by.mishelby.logistickapplication.domain.TruckDTO.TruckUpdateDTO;
 import by.mishelby.logistickapplication.model.truck.Truck.Truck;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface TruckService {
-    List<Truck> findAllTrucks();
+    Collection<Truck> findAllTrucks();
 
     Truck findTruckById(int id);
 
     Truck saveTruck(TruckCreateDTO truckDTO);
 
-    void updateTruck(TruckUpdateDTO truckUpdateDTO);
+    Truck updateTruck(int id, TruckUpdateDTO truckUpdateDTO);
 
     void deleteTruck(int id);
 

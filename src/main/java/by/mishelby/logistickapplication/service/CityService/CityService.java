@@ -6,10 +6,11 @@ import by.mishelby.logistickapplication.model.city.City;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface CityService {
-    List<City> findAll();
+    Collection<City> findAll();
 
     City findById(int id);
 

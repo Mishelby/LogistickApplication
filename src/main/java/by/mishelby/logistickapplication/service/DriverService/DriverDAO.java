@@ -3,6 +3,8 @@ package by.mishelby.logistickapplication.service.DriverService;
 import by.mishelby.logistickapplication.exceptions.DriverException.DriverDTOException;
 import by.mishelby.logistickapplication.domain.DriverDTO.DriverCreateDTO;
 import by.mishelby.logistickapplication.domain.DriverDTO.DriverUpdateDTO;
+import by.mishelby.logistickapplication.exceptions.NoChangesDetectedException;
+import by.mishelby.logistickapplication.exceptions.ResourceNotFoundException;
 import by.mishelby.logistickapplication.exceptions.TruckExceptions.TruckException;
 import by.mishelby.logistickapplication.mapper.DriverMapper;
 import by.mishelby.logistickapplication.model.driver.Driver;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,19 +33,23 @@ public class DriverDAO implements DriverService {
     private final DriverMapper driverMapper;
 
     @Override
-    public List<Driver> findAllDrivers() {
+    public Collection<Driver> findAllDrivers() {
         return driverRepository.findAll();
     }
 
     @Override
     public Driver findById(Integer id) {
         return driverRepository.findById(id).orElseThrow(()
-                -> new RuntimeException("Driver not found with id: " + id));
+                -> new ResourceNotFoundException("Driver not found with id: " + id));
     }
 
     @Override
-    public void updateDriver(DriverUpdateDTO updatedDriver) {
-        Driver driver = findById(updatedDriver.getId());
+    public Driver updateDriver(int id, DriverUpdateDTO updatedDriver) {
+        if (updatedDriver == null) {
+            throw new IllegalArgumentException("Updated Driver cannot be null");
+        }
+
+        Driver driver = findById(id);
         Truck currentTruck = driver.getCurrentTruck();
 
         if (currentTruck == null) {
@@ -53,12 +60,12 @@ public class DriverDAO implements DriverService {
 
         boolean isNew = isNew(updatedDriver, driver, currentTruck, newTruck);
 
-        log.info("Status is: " + isNew);
-        if (isNew) {
-            driverRepository.save(driver);
-        } else {
-            throw new TruckException("No content for update");
+        if (!isNew) {
+            throw new NoChangesDetectedException("No changes detected for Driver with id: " + id);
         }
+
+        driverRepository.save(driver);
+        return driver;
     }
 
     private static boolean isNew(DriverUpdateDTO updatedDriver, Driver driver, Truck currentTruck, Truck newTruck) {
@@ -84,7 +91,7 @@ public class DriverDAO implements DriverService {
             isNew = true;
         }
 
-        if (!Objects.equals(currentTruck.getId(), newTruck.getId())){
+        if (!Objects.equals(currentTruck.getId(), newTruck.getId())) {
             driver.setCurrentTruck(newTruck);
             if (newTruck.getDriver() == null) {
                 newTruck.setDriver(new ArrayList<>());
