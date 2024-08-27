@@ -5,6 +5,7 @@ import by.mishelby.logistickapplication.model.city.City;
 import by.mishelby.logistickapplication.model.order.Order.Order;
 import by.mishelby.logistickapplication.model.route_point.RoutePointType.RoutePointType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +13,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,11 +29,12 @@ public class RoutePoint {
     @Column(name = "route_id", unique = true, nullable = false)
     private BigInteger id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "city_id", referencedColumnName = "city_id")
     private City city;
 
     @OneToMany(mappedBy = "routePoint", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonBackReference
     private List<Cargo> cargo;
 
     @Enumerated(EnumType.STRING)
@@ -55,5 +58,6 @@ public class RoutePoint {
     public int hashCode() {
         return Objects.hashCode(id);
     }
+
 }
 

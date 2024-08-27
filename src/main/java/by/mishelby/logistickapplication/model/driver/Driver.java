@@ -8,6 +8,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.math.BigInteger;
+import java.time.Instant;
 
 @Entity
 @Data
@@ -48,8 +49,10 @@ public class Driver {
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "current_truck_id")
-    @JsonIgnoreProperties("driver")
     @ToString.Exclude
     private Truck currentTruck;
+
+    @Transient
+    private Instant lastModified ;
 
 }

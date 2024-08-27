@@ -52,6 +52,11 @@ public class CargoDAO implements CargoService {
     }
 
     @Override
+    public Cargo saveCargo(Cargo cargo) {
+        return cargoRepository.save(cargo);
+    }
+
+    @Override
     public Cargo findCargoById(int id) {
         return cargoRepository.findById(BigInteger.valueOf(id)).orElseThrow(()
                 -> new RuntimeException("Cargo with id " + id + " not found"));

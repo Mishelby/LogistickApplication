@@ -7,6 +7,7 @@ import by.mishelby.logistickapplication.model.driver.Driver;
 import by.mishelby.logistickapplication.service.DriverService.DriverDAO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -16,7 +17,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -31,8 +31,9 @@ public class DriverController {
             return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.ok(allDrivers);
+        return ResponseEntity.ok().body(allDrivers);
     }
+
 
     @GetMapping("/driver/{id}")
     public ResponseEntity<Driver> getDriver(@PathVariable("id") int id) {

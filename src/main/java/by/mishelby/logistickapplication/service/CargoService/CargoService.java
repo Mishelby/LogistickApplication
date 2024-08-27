@@ -15,6 +15,8 @@ public interface CargoService {
 
     Cargo createCargo(CargoCreateDTO cargoCreateDTO);
 
+    Cargo saveCargo(Cargo cargo);
+
     Cargo updateCargo(int id, CargoUpdateDTO cargoUpdateDTO);
 
     void deleteCargo(int id);

@@ -2,6 +2,7 @@ package by.mishelby.logistickapplication.model.truck.Truck;
 
 import by.mishelby.logistickapplication.model.driver.Driver;
 import by.mishelby.logistickapplication.model.truck.TruckStatus.TruckStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -42,7 +43,9 @@ public class Truck {
     @Column(name = "current_city", nullable = false)
     private String currentCity;
 
-    @OneToMany(mappedBy = "currentTruck", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "currentTruck", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private List<Driver> driver;
 
     @Override

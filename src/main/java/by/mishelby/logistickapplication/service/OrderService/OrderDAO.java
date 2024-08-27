@@ -1,9 +1,12 @@
 package by.mishelby.logistickapplication.service.OrderService;
 
+import by.mishelby.logistickapplication.domain.CargoDTO.CargoDTO;
+import by.mishelby.logistickapplication.domain.DriverDTO.DriverDTO;
 import by.mishelby.logistickapplication.domain.OrderDTO.CreateOrderDTO;
+import by.mishelby.logistickapplication.domain.OrderDTO.OrderDTO;
 import by.mishelby.logistickapplication.domain.OrderDTO.OrderUpdateDTO;
-import by.mishelby.logistickapplication.mapper.CargoMapper;
-import by.mishelby.logistickapplication.mapper.CityMapper;
+import by.mishelby.logistickapplication.domain.RoutePointDTO;
+import by.mishelby.logistickapplication.domain.TruckDTO.TruckDTO;
 import by.mishelby.logistickapplication.mapper.OrderMapper;
 import by.mishelby.logistickapplication.model.cargo.Cargo;
 import by.mishelby.logistickapplication.model.city.City;
@@ -19,12 +22,15 @@ import by.mishelby.logistickapplication.service.RoutePointsService.RoutePointsDA
 import by.mishelby.logistickapplication.service.TruckService.TruckDAO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,11 +43,10 @@ public class OrderDAO implements OrderService {
     private final DriverDAO driverDAO;
     private final RoutePointsDAO routePointsDAO;
     private final CityDAO cityDAO;
-    private final CityMapper cityMapper;
     private final CargoDAO cargoDAO;
-    private final CargoMapper cargoMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public List<Order> getAllOrders() {
         List<Order> orderList = orderRepository.findAll();
         if (orderList.isEmpty()) {
@@ -52,46 +57,97 @@ public class OrderDAO implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Order findById(int orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(()
+                -> new RuntimeException("Order not found"));
+
+        Hibernate.initialize(order.getTruck());
+        Hibernate.initialize(order.getDriver());
+        Hibernate.initialize(order.getCargo());
+        Hibernate.initialize(order.getRoutePoints());
+
+        for (RoutePoint routePoint : order.getRoutePoints()) {
+            Hibernate.initialize(routePoint.getCity());
+        }
+
+        return order;
+    }
+
+    @Override
     public Order createOrder(CreateOrderDTO createOrderDTO) {
 
         if (createOrderDTO == null) {
             throw new IllegalArgumentException("createOrderDTO cannot be null");
         }
 
-        Order createOrder = orderMapper.createOrderToOrder(createOrderDTO);
-        Truck truck = truckDAO.findTruckById(createOrderDTO.getId());
-        createOrder.setTruck(truck);
+        Truck truck = truckDAO.findTruckById(createOrderDTO.getTruckId());
+        Driver driver = driverDAO.findById(createOrderDTO.getDriverId());
+        City city = cityDAO.findByName(createOrderDTO.getCityName());
 
-        List<RoutePoint> routePoints = new ArrayList<>();
-        for (RoutePoint rPoint : createOrder.getRoutePoints()) {
-            City city = cityDAO.findById(rPoint.getCity().getId().intValue());
-            List<Cargo> cargos = cargoDAO.finAllCargos();
+        RoutePoint routePoint = new RoutePoint();
+        Cargo cargo = new Cargo();
 
-            RoutePoint routePoint = RoutePoint.builder()
-                    .city(rPoint.getCity())
-                    .cargo(rPoint.getCargo())
-                    .type(rPoint.getType())
-                    .order(createOrder)
-                    .build();
+        cargo.setCargoStatus(createOrderDTO.getCargoCreateDTO().getCargoStatus());
+        cargo.setNumber(createOrderDTO.getCargoCreateDTO().getNumber());
+        cargo.setWeight(createOrderDTO.getCargoCreateDTO().getWeight());
+        cargo.setDescription(createOrderDTO.getCargoCreateDTO().getDescription());
+        cargo.setRoutePoint(routePoint);
 
-            routePoints.add(routePoint);
-            routePoint.setCargo(cargos);
-        }
+        routePoint.setCity(city);
+        routePoint.setType(createOrderDTO.getType());
+        routePoint.setCargo(new ArrayList<>());
+        routePoint.setCargo(new ArrayList<>(Collections.singletonList(cargo)));
+        routePoint.setOrder(null);
 
-        List<Driver> drivers = new ArrayList<>();
-        for (Driver driver : createOrder.getDrivers()) {
-            drivers.add(driverDAO.findById(driver.getId().intValue()));
-        }
+        routePointsDAO.createRoutePoint(routePoint);
+        cargoDAO.saveCargo(cargo);
 
-        createOrder.setDrivers(drivers);
-        return orderRepository.save(createOrder);
+        Order order = new Order();
+        order.setStatus(createOrderDTO.getStatus());
+        order.setUniqueNumber(createOrderDTO.getUniqueNumber());
+        order.setStatus(createOrderDTO.getStatus());
+        order.setTruck(truck);
+        order.setDriver(driver);
+        order.setRoutePoints(new ArrayList<>(Collections.singletonList(routePoint)));
+        order.setCargo(cargo);
+        order.getRoutePoints().add(routePoint);
+
+
+        return orderRepository.save(order);
     }
 
     @Override
-    public Order findById(int orderId) {
-        return orderRepository.findById(orderId).orElseThrow(()
-                -> new RuntimeException("Order not found"));
+    public OrderDTO convertToDTO(Order order) {
+        OrderDTO orderDTO = new OrderDTO();
+
+        orderDTO.setId(order.getId());
+        orderDTO.setUniqueNumber(order.getUniqueNumber());
+        orderDTO.setStatus(order.getStatus());
+
+        if (order.getTruck() != null) {
+            orderDTO.setTruckId(order.getTruck().getId());
+        }
+
+        if (order.getDriver() != null) {
+            orderDTO.setDriverId(order.getDriver().getId());
+        }
+
+        if (order.getCargo() != null) {
+            orderDTO.setCargoId(order.getCargo().getId());
+        }
+
+        if (order.getRoutePoints() != null) {
+            List<BigInteger> routePointIds = order.getRoutePoints()
+                    .stream()
+                    .map(RoutePoint::getId)
+                    .toList();
+            orderDTO.setRoutePoints(routePointIds);
+        }
+
+        return orderDTO;
     }
+
 
     @Override
     public void updateOrder(OrderUpdateDTO orderUpdateDTO) {
@@ -101,6 +157,10 @@ public class OrderDAO implements OrderService {
         Order updateOrder = orderMapper.orderUpdateToOrder(orderUpdateDTO);
         orderRepository.save(updateOrder);
 
+    }
+
+    public void deleteOrder() {
+        deleteOrder(0);
     }
 
     @Override

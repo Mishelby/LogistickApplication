@@ -55,7 +55,7 @@ public class CargoController {
         return ResponseEntity.created(location).body(cargo);
     }
 
-    @PatchMapping("/cargo]/{id}")
+    @PatchMapping("/cargo/{id}")
     public ResponseEntity<Cargo> updateCargo(@PathVariable("id") int id,
                                              @RequestBody @Valid CargoUpdateDTO cargoUpdateDTO,
                                              BindingResult bindingResult) {

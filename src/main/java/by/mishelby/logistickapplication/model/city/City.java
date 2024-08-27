@@ -2,6 +2,7 @@ package by.mishelby.logistickapplication.model.city;
 
 import by.mishelby.logistickapplication.model.country_map.CountryMap;
 import by.mishelby.logistickapplication.model.distance.Distance;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

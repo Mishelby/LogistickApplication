@@ -5,7 +5,6 @@ import by.mishelby.logistickapplication.domain.DriverDTO.DriverCreateDTO;
 import by.mishelby.logistickapplication.domain.DriverDTO.DriverUpdateDTO;
 import by.mishelby.logistickapplication.exceptions.NoChangesDetectedException;
 import by.mishelby.logistickapplication.exceptions.ResourceNotFoundException;
-import by.mishelby.logistickapplication.exceptions.TruckExceptions.TruckException;
 import by.mishelby.logistickapplication.mapper.DriverMapper;
 import by.mishelby.logistickapplication.model.driver.Driver;
 import by.mishelby.logistickapplication.model.truck.Truck.Truck;
@@ -13,15 +12,11 @@ import by.mishelby.logistickapplication.repository.DriverRepository.DriverReposi
 import by.mishelby.logistickapplication.service.TruckService.TruckDAO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
-import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +33,7 @@ public class DriverDAO implements DriverService {
     }
 
     @Override
+    @Cacheable(value = "drivers", key = "#id")
     public Driver findById(Integer id) {
         return driverRepository.findById(id).orElseThrow(()
                 -> new ResourceNotFoundException("Driver not found with id: " + id));
@@ -125,4 +121,6 @@ public class DriverDAO implements DriverService {
         driverRepository.delete(driver);
         log.info("Driver with id {} was successfully deleted.", id);
     }
+
+
 }

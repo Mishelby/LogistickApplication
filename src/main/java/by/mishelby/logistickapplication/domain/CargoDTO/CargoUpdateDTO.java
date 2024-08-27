@@ -14,7 +14,7 @@ public class CargoUpdateDTO {
     private Integer cargoId;
 
     @NotBlank(message = "Cargo number should not be null or blank")
-    private BigDecimal number;
+    private Integer number;
 
     @NotBlank(message = "Description should not be null or blank")
     private String description;

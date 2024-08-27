@@ -2,6 +2,7 @@ package by.mishelby.logistickapplication.service.OrderService;
 
 
 import by.mishelby.logistickapplication.domain.OrderDTO.CreateOrderDTO;
+import by.mishelby.logistickapplication.domain.OrderDTO.OrderDTO;
 import by.mishelby.logistickapplication.domain.OrderDTO.OrderUpdateDTO;
 import by.mishelby.logistickapplication.model.order.Order.Order;
 
@@ -13,6 +14,8 @@ public interface OrderService {
     Order findById(int orderId);
 
     Order createOrder(CreateOrderDTO createOrderDTO);
+
+    OrderDTO convertToDTO(Order order);
 
     void updateOrder(OrderUpdateDTO order);
 
